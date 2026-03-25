@@ -1,30 +1,76 @@
 function fn() {
-  var env = karate.env; // get system property 'karate.env'
-  karate.log('karate.env system property was:', env);
 
-  var config = {
-    env: env,
-    pstBaseUrl : "https://pst-v2-prep.prj.onecaas.vpodg1np.carrefour.com",
+  /* =========================
+     ENVIRONMENT MANAGEMENT
+     ========================= */
 
-    ldap: {
-        url: "https://preprod.np.apimx.carrefour.com/retail/v3/access_management/authenticate",
-        clientId: "zCol80AhsBVu2UtbrMYJmrGXg549Ks002tATRzKLdDo8xdfQ",
-        clientSecret: "pycWqlBSzGxGjARnrGCvi1pUxo6iHGHT5YgDqIYOYZX4IHFtfJOdlCKIDST2eHeF",
-        user: "fr_bff_ucare",
-        password: "Carrefour123$"
-    },
-
-    apimx: {
-        url: "https://preprod.np.apimx.carrefour.com"
-    },
-    pst: {
-      baseUrl: "https://pst-v2-prep.prj.onecaas.vpodg1np.carrefour.com"
-    }
+  var env = karate.env; // valeur passée par -Dkarate.env
+  if (!env) {
+    env = 'recette'; // environnement par défaut
   }
 
-  karate.configure('ssl', true);
-//  karate.configure('proxy', { uri: 'http://webfile.carrefour.com:8080', username: 'openid_eol', password: 'MhK1X7password' });
+  karate.log('Karate environment is:', env);
 
+  var config = {};
+
+  if (env === 'recette') {
+    config.baseUrl = 'https://jsonplaceholder.typicode.com';
+  }
+  else if (env === 'preprod') {
+    config.baseUrl = 'https://jsonplaceholder.typicode.com';
+  }
+  else if (env === 'prod') {
+    config.baseUrl = 'https://jsonplaceholder.typicode.com';
+  }
+
+  /* =========================
+     HTTP STATUS
+     ========================= */
+
+  config.httpStatus = read('classpath:features/data/status/http-status.json');
+
+  /* =========================
+     RANDOM HELPERS
+     ========================= */
+
+  config.randomEmail = function () {
+    return 'user_' + Date.now() + '_' +
+      Math.random().toString(36).substring(2, 10) + '@example.com';
+  };
+
+  config.randomName = function () {
+    var names = ['Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Frank', 'Grace', 'Hannah'];
+    return names[Math.floor(Math.random() * names.length)] + '_' +
+      Math.random().toString(36).substring(2, 6);
+  };
+
+  config.randomUsername = function () {
+    return 'user_' + Math.random().toString(36).substring(2, 10);
+  };
+
+  config.randomCity = function () {
+    var cities = ['Paris', 'Lyon', 'Marseille', 'Tunis', 'Berlin', 'Madrid', 'Rome'];
+    return cities[Math.floor(Math.random() * cities.length)];
+  };
+
+  config.randomAddress = function () {
+    var streets = ['Rue de la Paix', 'Avenue Habib Bourguiba', 'Champs-Élysées', 'Main Street'];
+    return Math.floor(Math.random() * 200) + ' ' +
+      streets[Math.floor(Math.random() * streets.length)];
+  };
+
+  config.randomZipCode = function () {
+    return Math.floor(10000 + Math.random() * 90000).toString();
+  };
+
+  config.randomPhone = function () {
+    return '+33' + Math.floor(600000000 + Math.random() * 399999999);
+  };
+
+  config.randomCompany = function () {
+    var companies = ['Google', 'Amazon', 'OpenAI', 'Microsoft', 'Meta'];
+    return companies[Math.floor(Math.random() * companies.length)];
+  };
 
   return config;
 }
